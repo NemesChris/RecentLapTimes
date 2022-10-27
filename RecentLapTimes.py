@@ -28,8 +28,6 @@ invalidlap = False
 lapTipusokList = []  # 0 - piros, 1 - sima, 2 - rekord
 
 
-
-
 def acMain(ac_version):
     global l_lapcount, l_laptime, l_lastlaptime, l_korszam, l_besttext, l_besttime
     global maxLaps
@@ -54,7 +52,6 @@ def acMain(ac_version):
     if not os.path.exists(idodirectory):
         ac.log('ini directory ' + iniDirectory + ' does not exist, try to create it')
         os.makedirs(idodirectory)
-
     try:
         with open(idodirectory + 'record.txt') as f:
             lines = f.readlines()
@@ -70,23 +67,23 @@ def acMain(ac_version):
 
     # Eredmeny-doboz beallitasa
     appWindow = ac.newApp("RecentLapTimes")
-    ac.setSize(appWindow, 250, 65 + maxLaps * 40 + 100)
+    ac.setSize(appWindow, 250, 65 + maxLaps * 30 + 110)
     ac.setBackgroundOpacity(appWindow, 0)
     ac.drawBorder(appWindow, 0)
 
     # cimkek felul
-    l_lapcount = ac.addLabel(appWindow, "Laps:           Times:")
-    ac.setPosition(l_lapcount, 5, 30)
+    l_lapcount = ac.addLabel(appWindow, "Laps:              Times:")
+    ac.setPosition(l_lapcount, 5, 35)
     ac.setCustomFont(l_lapcount, "Formula", 0, 0)
-    ac.setFontSize(l_lapcount, 22)
-    ac.setFontColor(l_lapcount, 1, 1, 1, 1)
+    ac.setFontSize(l_lapcount, 18)
+    ac.setFontColor(l_lapcount, 0.7, 0.7, 0.7, 1)
 
     # Rekord kor szoveg
     l_besttext = ac.addLabel(appWindow, "All Time Best:")
-    ac.setPosition(l_besttext, 5, 65 +  maxLaps * 40 + 45)
+    ac.setPosition(l_besttext, 5, 65 +  maxLaps * 30 + 45)
     ac.setCustomFont(l_besttext, "Formula", 0, 0)
-    ac.setFontSize(l_besttext, 22)
-    ac.setFontColor(l_besttext, 1, 1, 1, 1)
+    ac.setFontSize(l_besttext, 16)
+    ac.setFontColor(l_besttext, 0.7, 0.7, 0.7, 1)
 
 
     # REKORD KoR
@@ -94,40 +91,40 @@ def acMain(ac_version):
         l_besttime = ac.addLabel(appWindow, "-:--.---")
     else:
         l_besttime = ac.addLabel(appWindow, time_to_string(besttime, True))
-    ac.setPosition(l_besttime, 90, 65 + maxLaps * 40 + 80)
+    ac.setPosition(l_besttime, 90, 65 + maxLaps * 30 + 80)
     ac.setCustomFont(l_besttime, "Formula", 0, 0)
-    ac.setFontSize(l_besttime, 18)
-    ac.setFontColor(l_besttime, 1, 1, 1, 1)
-
-
+    ac.setFontSize(l_besttime, 14)
+    ac.setFontColor(l_besttime, 0.7, 0.7, 0.7, 1)
 
     ac.log("Max Laps: " + str(maxLaps))
+
+    # 0 - maxLaps-1
     for i in range(0, maxLaps):
         l_lastlaptime = ac.addLabel(appWindow, "")
         ac.setCustomFont(l_lastlaptime, "Formula", 0, 0)
-        ac.setFontSize(l_lastlaptime, 18)
-        ac.setFontColor(l_lastlaptime, 1, 1, 1, 1)
+        ac.setFontSize(l_lastlaptime, 14)
+        ac.setFontColor(l_lastlaptime, 0.7, 0.7, 0.7, 1)
 
         l_korszam = ac.addLabel(appWindow, "")
         ac.setCustomFont(l_korszam, "Formula", 0, 0)
-        ac.setFontSize(l_korszam, 20)
-        ac.setFontColor(l_korszam, 1, 1, 1, 1)
+        ac.setFontSize(l_korszam, 15)
+        ac.setFontColor(l_korszam, 0.7, 0.7, 0.7, 1)
 
         kiirasHelyek.append(l_lastlaptime)
         korHelyek.append(l_korszam)
-        # ac.log("i generalas: " + str(i))
 
     z = 0
-    ac.log("letrejott kiirashelyek: " + str(len(kiirasHelyek)))
+    ac.log("Letrejott kiirashelyek: " + str(len(kiirasHelyek)) + "   (vart: " + str(maxLaps) + ")")
     for kiiras in kiirasHelyek:
-        ac.setPosition(kiiras, 90, 65 + (40 * z))
+        ac.setPosition(kiiras, 110, 65 + (30 * z))
         z += 1
 
     z = 0
     for szamhely in korHelyek:
-        ac.setPosition(szamhely, 20, 65 + (40 * z))
+        ac.setPosition(szamhely, 20, 65 + (30 * z))
         z += 1
 
+    ac.log("Generalas kesz.")
     return "RecentLapTimes"
 
 
@@ -149,19 +146,20 @@ def acUpdate(deltaT):
     global invalidlap
     global lapTipusokList
 
-    laps = ac.getCarState(0, acsys.CS.LapCount)
+    laps = ac.getCarState(0, acsys.CS.LapCount)    
 
-    if laps <= lapcount:
-        if int(info.physics.numberOfTyresOut) > 3:
+    if laps <= lapcount and laps > 0:
+        if int(info.physics.numberOfTyresOut) > 3:            
             invalidlap = True
 
     if laps > lapcount:
         lapcount = laps
         ac.log("------------------------------")
-        ac.log("uJ KoR (" + str(lapcount) + ".) BEFEJEZVE")
+        ac.log("------------------------------")
+        ac.log("UJ KOR (" + str(lapcount) + ".) BEFEJEZVE")
         ac.log("------------------------------")
         rekord = False
-        ac.log("LAP INVALID? " + str(invalidlap))
+        ac.log("LAP WAS INVALID? " + str(invalidlap))
 
         ac.log("{} laps completed".format(lapcount))
         ac.console("{} laps completed".format(lapcount))
@@ -171,7 +169,7 @@ def acUpdate(deltaT):
         ac.log("Rekordkor eddig: " + str(besttime))
         ac.log("Mostani kor meg: " + str(lastlaptime))
         if besttime > lastlaptime and lastlaptime != 0:
-            ac.log("uJ REKORD (elvileg)!")
+            ac.log("UJ REKORD (elvileg)!")
             rekord = True
             besttime = lastlaptime
 
@@ -179,22 +177,22 @@ def acUpdate(deltaT):
 
         lapList.append(lastlaptime)
         korList.append(str(lapcount))
-        ac.log("uj kor hozzaadva: " + str(lastlaptime))
+        ac.log("Uj kor hozzaadva a listahoz: " + str(lastlaptime))
 
+        ac.log("Eddig ennyi kor van bejegyezve: " + str(len(lapList)))
         if len(lapList) > maxLaps:
             lapList.pop(0)
-            ac.log("Sok kor volt mar, az utolsot kibasszuk")
+            kibaszottKor = korList.pop(0)
 
-        if len(korList) > maxLaps:
-            korList.pop(0)
+            ac.log("Sok kor volt mar, az eddigi elsot(" + str(kibaszottKor) + ".) kibasszuk!")          
 
         # elobb a nullazas
         z = 0
         for hely in kiirasHelyek:
-            ac.setFontColor(kiirasHelyek[z], 1, 1, 1, 1)
-            ac.setFontColor(korHelyek[z], 1, 1, 1, 1)
+            ac.setFontColor(kiirasHelyek[z],  0.7, 0.7, 0.7, 1)
+            ac.setFontColor(korHelyek[z], 0.7, 0.7, 0.7, 1)
             z += 1
-        ac.log("AZ UTOLSo teljesitett: " + str(lapcount))
+        ac.log("Az UTOLSO teljesitett: " + str(lapcount) + ". kor volt")
         if rekord == True:
             # kellene tudni, hogy a rekord az hanyas helyre kerul, de mindig az utolsohoz...
             # ha eddig mashol volt, az torolni (vissza feherre) kell!
@@ -202,13 +200,12 @@ def acUpdate(deltaT):
             # ha szabalyos kor volt
             if invalidlap == True:
                 # majd az utolsot lilara
-                ac.log("Rekord, de invalid [0]")
+                ac.log("Rekord, de invalid lett [0]")
                 lapTipusokList.append(0)
-            else:
-                ac.log("AZ UTOLSo: " + str(lapcount))
+            else:               
                 # majd az utolsot lilara
-                ac.log("rekord lett [2]")
-                ac.log("Bekerul a mentesbe!")
+                ac.log("Rekord lett szabalyosan [2]")
+                ac.log("Bekerul a mentesbe is!")
                 lapTipusokList.append(2)
                 ac.setText(l_besttime, lastlaptime)
                 try:
@@ -218,16 +215,15 @@ def acUpdate(deltaT):
                     pass
                 except Exception as e:
                     ac.log(str(e))
-
         else:
             # nem rekord kor, csak sima
             if invalidlap == True:
                 # majd az utolsot lilara
-                ac.log("Sima, de invalid [0]")
+                ac.log("Sima kor volt csak, de invalid is [0]")
                 lapTipusokList.append(0)
             else:
                 # majd az utolsot lilara
-                ac.log("Szimpla feher [1]")
+                ac.log("Sima kor volt csak [1]")
                 lapTipusokList.append(1)
 
         # meg be kell tenni a megfelelot a megfelelo helyre
@@ -241,22 +237,21 @@ def acUpdate(deltaT):
             ac.setText(korHelyek[z], str(korList[z]) + ".")
             z += 1
 
-
-
+        ac.log("------------")
+        ac.log("Szinezes")
         ac.log("------------")
         # meg be kell szinezni a szinertekek alapjan
         voltmarrekord = False
         if lapcount > 0:
-            ac.log("Teljesitett korok szama: " + str(lapcount ))
+            ac.log("Eddig teljesitett korok szama: " + str(lapcount ))
             ac.log("Tipusok: eddig" + str(lapTipusokList))
 
             if len(lapTipusokList) > maxLaps:
-                lapTipusokList.pop(0)
-                ac.log("Sok tipus volt, az elsot toroltuk")
-            ac.log("Szinezes...")
+                toroltlap = lapTipusokList.pop(0)
+                ac.log("Sok tipus volt, az elsot (" + str(toroltlap) + ") toroltuk")            
             for i in range(len(lapTipusokList)-1,-1,-1):
-                ac.log("Ez a kor van soron: " + str(i))
-                ac.log("tipusa: " + str(lapTipusokList[i]))
+                ac.log("Ez a kor van soron szinezesben: " + str(i+1))
+                ac.log("Tipusa: " + str(lapTipusokList[i]))
                 if lapTipusokList[i] == 0:
                     # piros lap
                     # 0, 1 volt, es most a 3. korben a 3-1-edikre akarja betenni
@@ -264,27 +259,27 @@ def acUpdate(deltaT):
                     # tehat, ha mar tobb kor van, mint a maxlaps, akkor csak a maxlaps-nyi hely van
                     ac.setFontColor(kiirasHelyek[i], 1, 0, 0, 1)
                     ac.setFontColor(korHelyek[i], 1, 0, 0, 1)
-                    ac.log(" ez invalid volt [0] >>> piros")
-                    ac.log("Helye: " + str(i))
+                    ac.log("Ez invalid volt [0] >>> piros")
+                    ac.log("Helye: a listaban: " + str(i+1))
                 elif lapTipusokList[i] == 1:
                     # sima lap
-                    ac.setFontColor(kiirasHelyek[i], 1, 1, 1, 1)
-                    ac.setFontColor(korHelyek[i], 1, 1, 1, 1)
-                    ac.log("ez sima lap volt [1] >>> feher")
-                    ac.log("Helye: " + str(i))
+                    ac.setFontColor(kiirasHelyek[i], 0.7, 0.7, 0.7, 1)
+                    ac.setFontColor(korHelyek[i], 0.7, 0.7, 0.7, 1)
+                    ac.log("Ez sima lap volt [1] >>> feher")
+                    ac.log("Helye: a listaban: " + str(i+1))
                 elif lapTipusokList[i] == 2:
                     # rekord lap
                     if voltmarrekord == False:
                         ac.setFontColor(kiirasHelyek[i], 1, 0, 1, 1)
                         ac.setFontColor(korHelyek[i], 1, 0, 1, 1)
-                        ac.log("ez rekord kor volt [2] >>> lila")
-                        ac.log("Helye: " + str(i))
+                        ac.log("Ez rekord kor volt [2] >>> lila")
+                        ac.log("Helye: a listaban: " + str(i+1))
                         voltmarrekord = True
                     else:
-                        ac.setFontColor(kiirasHelyek[i], 1, 1, 1, 1)
-                        ac.setFontColor(korHelyek[i], 1, 1, 1, 1)
-                        ac.log("ez sima lap volt, mert mar volt rekord kesobb [2 > 1] >>> feher")
-                        ac.log("Helye: " + str(i))
+                        ac.setFontColor(kiirasHelyek[i], 0.7, 0.7, 0.7, 1)
+                        ac.setFontColor(korHelyek[i], 0.7, 0.7, 0.7, 1)
+                        ac.log("Ez sima lap volt, mert mar volt rekord kesobb [2 > 1] >>> feher")
+                        ac.log("Helye: a listaban: " + str(i+1))
                 ac.log("--------")
         invalidlap = False
 
@@ -306,5 +301,11 @@ def time_to_string(t, include_ms=True):
 
 
 def acShutdown():
-    ac.log("Chris's first app is closing now...")
+    ac.log("RecentLapTimes is closing now...")
     return
+
+
+
+# ha a felvezető piros,
+# akkor ő beteszi pirosnak az első kört is!
+# vajon az hanyadik körnek van véve?
