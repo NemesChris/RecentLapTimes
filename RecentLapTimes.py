@@ -6,7 +6,7 @@ import acsys
 from sim_info import info
 
 # maximum korok szama, amit mutasson az app
-maxLaps = 3
+maxLaps = 10
 
 
 l_lapcount = 0
@@ -39,7 +39,6 @@ def acMain(ac_version):
     global idodirectory
     global invalidlap
     global rekord
-
 
     palyanev = ac.getTrackName(0)
     kocsinev = ac.getCarName(0)
@@ -80,7 +79,7 @@ def acMain(ac_version):
 
     # Rekord kor szoveg
     l_besttext = ac.addLabel(appWindow, "All Time Best:")
-    ac.setPosition(l_besttext, 5, 65 +  maxLaps * 30 + 45)
+    ac.setPosition(l_besttext, 5, 65 + maxLaps * 30 + 45)
     ac.setCustomFont(l_besttext, "Formula", 0, 0)
     ac.setFontSize(l_besttext, 16)
     ac.setFontColor(l_besttext, 0.7, 0.7, 0.7, 1)
@@ -159,6 +158,11 @@ def acUpdate(deltaT):
         ac.log("UJ KOR (" + str(lapcount) + ".) BEFEJEZVE")
         ac.log("------------------------------")
         rekord = False
+
+        if lapcount == 1:
+            # első, felvezető kör volt
+            invalidlap = True
+
         ac.log("LAP WAS INVALID? " + str(invalidlap))
 
         ac.log("{} laps completed".format(lapcount))
@@ -305,7 +309,7 @@ def acShutdown():
     return
 
 
-
+# fent meg kell adni, mennyi legyen a max lap, amit néz
 # ha a felvezető piros,
 # akkor ő beteszi pirosnak az első kört is!
 # vajon az hanyadik körnek van véve?
